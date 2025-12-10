@@ -1,6 +1,6 @@
 ---
 name: beads-workflow
-description: Use when working in any project with .beads/ directory, at session start/end, or when creating/managing issues - enforces session close protocol, dependency direction, and core bd commands
+description: Use when working in any project with .beads/ directory, at session start/end, creating/managing issues, or syncing work to git - enforces session close protocol, dependency direction, and core bd commands
 ---
 
 # Beads Workflow
@@ -129,3 +129,8 @@ bd --no-daemon <command>
 
 - Projects without `.beads/` directory
 - Quick questions that don't involve task tracking
+
+## References
+
+- [Setup Guide](docs/setup.md) - Installation and daemon configuration
+- [CLI Reference](docs/cli-reference.md) - Complete command reference
