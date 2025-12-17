@@ -90,6 +90,15 @@ git commit -m "chore: sync with beads v0.X.Y"
 git push
 ```
 
+## Testing
+
+```bash
+./scripts/validate.sh    # Check plugin structure
+./scripts/check-drift.sh # Check if upstream has changes
+```
+
+CI runs these automatically on push/PR.
+
 ## Requirements
 
 The sync script requires:
