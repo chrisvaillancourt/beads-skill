@@ -5,29 +5,40 @@ Copy this file to your team repo and follow the setup steps.
 ## Initial Setup (One-Time, by Repo Owner)
 
 ```bash
-# 1. Initialize beads
-bd init --quiet
+# 1. Initialize beads with team wizard
+bd init --team
+```
 
-# 2. Configure sync branch (edit .beads/config.yaml)
-#    Uncomment or add: sync-branch: "beads-sync"
+The wizard will:
+- Ask if your main branch is protected
+- Configure sync branch if needed (for protected main)
+- Enable auto-sync (daemon commits/pushes)
+- Create AGENTS.md with landing-the-plane instructions
 
-# 3. Create sync branch
-git checkout -b beads-sync
-git push -u origin beads-sync
-git checkout main
-
-# 4. Install hooks
+```bash
+# 2. Install hooks
 bd hooks install
 
-# 5. Apply v0.30.2 hook workaround
+# 3. Apply v0.30.2 hook workaround
 #    Edit .git/hooks/post-checkout line ~77
 #    Change: bd sync --import-only --no-git-history
 #    To:     bd sync --import-only
 
-# 6. Commit setup
-git add .beads/ .gitattributes
+# 4. Commit setup
+git add .beads/ .gitattributes AGENTS.md
 git commit -m "chore: initialize beads for team issue tracking"
 git push
+```
+
+### If Main is Protected
+
+If you answered "yes" to protected main, the wizard configures a sync branch.
+You'll need to create and push it:
+
+```bash
+git checkout -b beads-sync
+git push -u origin beads-sync
+git checkout main
 ```
 
 ## Team Member Setup
@@ -70,7 +81,7 @@ alias bdw='BEADS_NO_DAEMON=1 bd'  # "bd worktree"
 
 ## AGENTS.md Section
 
-Add this to your repo's AGENTS.md:
+`bd init --team` creates an AGENTS.md automatically. If you already have one, merge the content below:
 
 ```markdown
 ## Issue Tracking
