@@ -154,7 +154,7 @@ Add to your repo's AGENTS.md:
 ```markdown
 ### Parallel Agent / Worktree Setup
 
-**Environment:** Use the smart `bd` wrapper (see beads-plugin README) which auto-detects worktrees.
+**Environment:** Use the smart `bd` wrapper (see beads-skill README) which auto-detects worktrees.
 
 **Claiming work:** Run `bd update <id> --status in_progress` BEFORE starting work to avoid conflicts with other agents.
 

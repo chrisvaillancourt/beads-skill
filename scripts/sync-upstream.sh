@@ -131,7 +131,7 @@ tmp=$(mktemp)
 # Update plugin.json - version and description with upstream version
 jq --arg v "$LOCAL_BD_VERSION" '
   .version = $v |
-  .description = "Official beads skill for Claude Code - issue tracking without MCP overhead. Mirrors steveyegge/beads skills/beads/ content (upstream version \($v))."
+  .description = "Beads skill mirror for Claude Code - issue tracking without MCP overhead. Mirrors steveyegge/beads skills/beads/ content (upstream version \($v))."
 ' "$PROJECT_ROOT/.claude-plugin/plugin.json" > "$tmp"
 mv "$tmp" "$PROJECT_ROOT/.claude-plugin/plugin.json"
 log_info "plugin.json version set to $LOCAL_BD_VERSION"

@@ -67,7 +67,7 @@ This automatically handles both regular repos and git worktree setups - no manua
 
 ```bash
 # Add the repo as a marketplace (one-time setup)
-claude plugin marketplace add chrisvaillancourt/beads-plugin
+claude plugin marketplace add chrisvaillancourt/beads-skill
 
 # Install the plugin
 claude plugin install beads-skill
@@ -126,7 +126,7 @@ This is a local fix (`.git/hooks/` isn't tracked). When beads releases a fix, ru
 This plugin mirrors the official beads skill. To update when beads releases new versions:
 
 ```bash
-cd /path/to/beads-plugin
+cd /path/to/beads-skill
 ./scripts/sync-upstream.sh
 git add .
 git commit -m "chore: sync with beads vX.Y.Z"

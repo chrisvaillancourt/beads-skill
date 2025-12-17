@@ -1,12 +1,12 @@
 {
   "name": "beads-skill",
   "version": "0.30.2",
-  "description": "Official beads skill for Claude Code - issue tracking without MCP overhead. Mirrors steveyegge/beads skills/beads/ content (upstream version 0.30.2).",
+  "description": "Beads skill mirror for Claude Code - issue tracking without MCP overhead. Mirrors steveyegge/beads skills/beads/ content (upstream version 0.30.2).",
   "author": {
     "name": "Chris Vaillancourt"
   },
-  "homepage": "https://github.com/chrisvaillancourt/beads-plugin",
-  "repository": "https://github.com/chrisvaillancourt/beads-plugin",
+  "homepage": "https://github.com/chrisvaillancourt/beads-skill",
+  "repository": "https://github.com/chrisvaillancourt/beads-skill",
   "license": "MIT",
   "keywords": [
     "beads",
