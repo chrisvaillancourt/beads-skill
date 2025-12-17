@@ -8,7 +8,12 @@
   "homepage": "https://github.com/chrisvaillancourt/beads-plugin",
   "repository": "https://github.com/chrisvaillancourt/beads-plugin",
   "license": "MIT",
-  "keywords": ["beads", "issue-tracking", "workflow", "skill"],
+  "keywords": [
+    "beads",
+    "issue-tracking",
+    "workflow",
+    "skill"
+  ],
   "upstream": {
     "repo": "https://github.com/steveyegge/beads",
     "path": "skills/beads",

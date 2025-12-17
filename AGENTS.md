@@ -15,22 +15,71 @@ skills/
     references/         # Reference docs (mirrored from upstream)
 scripts/
   sync-upstream.sh      # Script to update from upstream
+.beads/                 # Beads issue tracking for this project
 ```
 
-## Maintenance
+## Updating from Upstream
 
-This repo mirrors content from `steveyegge/beads/skills/beads/`. When beads releases updates:
+### When to Update
+
+Update this plugin when:
+- Beads releases a new version (`brew upgrade bd`)
+- You notice the skill content is outdated
+- Upstream announces skill changes
+
+### How to Update
 
 ```bash
+# 1. Update local bd first (optional but recommended)
+brew upgrade bd
+
+# 2. Run sync script
 ./scripts/sync-upstream.sh
+
+# 3. Review changes
+git diff
+
+# 4. Commit and push
+git add .
+git commit -m "chore: sync with beads vX.Y.Z"
+git push
 ```
 
-This downloads the latest skill and reference files, then updates the version in plugin.json.
+### What the Sync Script Does
+
+| Step | Automated? | Details |
+|------|------------|---------|
+| Download SKILL.md | ✅ Yes | Overwrites local copy |
+| Discover reference files | ✅ Yes | Uses GitHub API to find all files |
+| Download reference files | ✅ Yes | Downloads all discovered files |
+| Remove stale files | ✅ Yes | Deletes local files not in upstream |
+| Update plugin.json version | ✅ Yes | Sets to local bd version |
+| Commit changes | ❌ Manual | You review and commit |
+
+### What Changes the Script Handles
+
+| Change Type | Handled? | Notes |
+|-------------|----------|-------|
+| Content updates | ✅ | Files are overwritten |
+| New files added upstream | ✅ | Auto-discovered via API |
+| Files removed upstream | ✅ | Stale files deleted |
+| Files renamed upstream | ✅ | Old name deleted, new name downloaded |
+| New subdirectories | ❌ | Script only handles `references/` |
+| Skill restructuring | ❌ | May need script updates |
+
+### Edge Cases Requiring Manual Intervention
+
+1. **Structural changes**: If upstream reorganizes (e.g., adds `references/advanced/`), update the script.
+
+2. **GitHub API rate limiting**: Script falls back to hardcoded file list. If new files were added, they'll be missed. Re-run later or add to fallback list.
+
+3. **Version mismatch**: Script uses local `bd version`. If you haven't upgraded bd but want latest skill, manually edit plugin.json version.
 
 ## What NOT to Do
 
 - Don't modify `skills/beads/SKILL.md` directly - it will be overwritten on sync
 - Don't add custom content to `skills/beads/references/` - same reason
+- Don't manually edit plugin.json version - let the script handle it
 
 ## Git Workflow
 
@@ -40,6 +89,13 @@ git add .
 git commit -m "chore: sync with beads v0.X.Y"
 git push
 ```
+
+## Requirements
+
+The sync script requires:
+- `curl` - for downloading files
+- `jq` - for JSON parsing (`brew install jq`)
+- `bd` - for version detection
 
 ## Landing the Plane (Session Completion)
 
