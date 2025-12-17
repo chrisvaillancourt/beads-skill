@@ -17,14 +17,20 @@ For teams running multiple AI agents in parallel using git worktrees.
 
 ## Environment Setup
 
-Add to shell profile (`~/.zshrc` or `~/.bashrc`):
+If you followed the main [README setup](../README.md#3-add-smart-bd-wrapper-global-one-time), the smart `bd` wrapper automatically detects worktrees and sets `BEADS_NO_DAEMON=1`. No additional configuration needed.
+
+If you skipped that step, add to `~/.zshrc` (or `~/.bashrc`):
 
 ```bash
-# Required for worktrees
-export BEADS_NO_DAEMON=1
-
-# Convenience alias
-alias bdw='BEADS_NO_DAEMON=1 bd'
+# Smart bd wrapper - auto-detects worktrees and disables daemon
+bd() {
+  if [ -f .git ] 2>/dev/null || \
+     [ "$(git rev-parse --git-dir 2>/dev/null)" != "$(git rev-parse --git-common-dir 2>/dev/null)" ]; then
+    BEADS_NO_DAEMON=1 command bd "$@"
+  else
+    command bd "$@"
+  fi
+}
 ```
 
 ## Per-Worktree Setup
@@ -50,12 +56,13 @@ bd hooks install
 ### Start Session
 
 ```bash
-export BEADS_NO_DAEMON=1
 git pull
 bd sync --import-only           # Get latest issue state
 bd ready --json                 # Find available work
 bd update <id> --status in_progress  # CLAIM before working
 ```
+
+(The smart wrapper handles `BEADS_NO_DAEMON=1` automatically)
 
 **Important:** Always claim an issue before starting work. If another agent already claimed it, pick a different one.
 
@@ -114,9 +121,13 @@ bd merge %A %O %A %B
 
 ## Checklist
 
+### One-Time Setup
+```
+[ ] Smart bd wrapper in ~/.zshrc (see README step 3)
+```
+
 ### Per-Worktree Setup
 ```
-[ ] BEADS_NO_DAEMON=1 in environment
 [ ] bd hooks install
 [ ] Hook v0.30.2 workaround applied
 ```
@@ -143,7 +154,7 @@ Add to your repo's AGENTS.md:
 ```markdown
 ### Parallel Agent / Worktree Setup
 
-**Environment:** Always set `BEADS_NO_DAEMON=1`
+**Environment:** Use the smart `bd` wrapper (see beads-plugin README) which auto-detects worktrees.
 
 **Claiming work:** Run `bd update <id> --status in_progress` BEFORE starting work to avoid conflicts with other agents.
 
@@ -155,9 +166,15 @@ Add to your repo's AGENTS.md:
 ## Troubleshooting
 
 **"Database is locked"**
+
+If using the smart wrapper, this shouldn't happen. Verify the wrapper is loaded:
 ```bash
-export BEADS_NO_DAEMON=1
-bd sync --no-daemon
+type bd  # Should show "bd is a shell function"
+```
+
+If not using the wrapper, manually disable daemon:
+```bash
+BEADS_NO_DAEMON=1 bd sync
 ```
 
 **Agent claimed issue I was working on**
