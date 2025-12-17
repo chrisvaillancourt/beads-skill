@@ -28,38 +28,87 @@ The skill covers:
 - Dependency patterns
 - Issue creation guidelines
 
-## Installation
+## Complete Setup Guide
+
+### 1. Install beads CLI
 
 ```bash
-# Install beads CLI first (if not already)
 brew tap steveyegge/beads
 brew install bd
-
-# Install this plugin
-/plugin add chrisvaillancourt/beads-plugin
 ```
 
-## Recommended: Also Install Hooks
-
-For best results, also install the official hooks which run `bd prime` for dynamic context:
+### 2. Install Claude Code hooks (global, one-time)
 
 ```bash
 bd setup claude
 ```
 
-The hooks provide dynamic project-specific context, while this skill provides comprehensive reference documentation.
+This installs `SessionStart` and `PreCompact` hooks that run `bd prime` for dynamic context injection.
+
+### 3. Install this plugin
+
+```bash
+/plugin add chrisvaillancourt/beads-plugin
+```
+
+### 4. Initialize beads in your project
+
+```bash
+cd your-project
+bd init --quiet
+bd hooks install
+```
+
+### 5. (Optional) Configure sync branch for clean git history
+
+For team projects or if you want beads commits separate from code commits:
+
+```bash
+# Edit .beads/config.yaml and uncomment:
+# sync-branch: "beads-sync"
+
+# Then create the branch:
+git checkout -b beads-sync
+git checkout main
+```
+
+### 6. Apply post-checkout hook workaround (v0.30.2 bug)
+
+See [Known Issues](#known-issues) below.
+
+## Known Issues
+
+### Post-checkout hook error (beads v0.30.2)
+
+**Issue:** [steveyegge/beads#608](https://github.com/steveyegge/beads/issues/608)
+
+After `bd hooks install`, branch switching shows this error:
+```
+Warning: Failed to sync bd changes after checkout
+Error: unknown flag: --no-git-history
+```
+
+**Workaround:** Edit `.git/hooks/post-checkout` and change line ~77 from:
+```bash
+if ! output=$(bd sync --import-only --no-git-history 2>&1); then
+```
+to:
+```bash
+if ! output=$(bd sync --import-only 2>&1); then
+```
+
+This is a local fix (`.git/hooks/` isn't tracked). When beads releases a fix, run `bd hooks install` to get the corrected version.
 
 ## Updating
 
 This plugin mirrors the official beads skill. To update when beads releases new versions:
 
 ```bash
-# Check current version
-cat .claude-plugin/plugin.json | grep upstream -A3
-
-# Update (manual process for now)
 cd /path/to/beads-plugin
-./scripts/sync-upstream.sh  # TODO: create this script
+./scripts/sync-upstream.sh
+git add .
+git commit -m "chore: sync with beads vX.Y.Z"
+git push
 ```
 
 ## Upstream
