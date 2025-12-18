@@ -42,6 +42,9 @@ For each new worktree:
 git worktree add ../repo-feature-x feature-x
 cd ../repo-feature-x
 
+# Initialize bd (worktrees need their own database)
+bd init --quiet
+
 # Install hooks
 bd hooks install
 
@@ -49,7 +52,12 @@ bd hooks install
 # Edit .git/hooks/post-checkout line ~77
 # Change: bd sync --import-only --no-git-history
 # To:     bd sync --import-only
+
+# Configure integrations (database-only settings don't sync via git)
+./scripts/setup-bd.sh
 ```
+
+**Note:** Integration settings (github.org, jira.url) are stored in the database, not config.yaml. Each worktree needs these configured. See [CONFIGURATION.md](../skills/beads/references/CONFIGURATION.md) for details.
 
 ## Agent Session Workflow
 
@@ -119,17 +127,36 @@ Or use the merge driver (should be auto-configured):
 bd merge %A %O %A %B
 ```
 
+## Automated Worktree Setup
+
+Instead of manual setup, use Claude Code SessionStart hooks to automate worktree initialization.
+
+See [BEADS-TEAM-SETUP.md#automated-worktree-setup](BEADS-TEAM-SETUP.md#automated-worktree-setup) for:
+- `session-setup.sh` - Automatic bd init and integration config
+- `claude-settings.json` - Hook configuration
+
+With automation configured, new worktrees are initialized automatically when Claude Code starts.
+
 ## Checklist
 
 ### One-Time Setup
 ```
 [ ] Smart bd wrapper in ~/.zshrc (see README step 3)
+[ ] (Optional) Claude Code automation hooks configured
 ```
 
-### Per-Worktree Setup
+### Per-Worktree Setup (Manual)
 ```
+[ ] bd init --quiet
 [ ] bd hooks install
 [ ] Hook v0.30.2 workaround applied
+[ ] ./scripts/setup-bd.sh (integration settings)
+```
+
+### Per-Worktree Setup (Automated)
+```
+[ ] Claude Code SessionStart hook runs automatically
+[ ] Verify with: bd doctor
 ```
 
 ### Per-Session Start
@@ -193,3 +220,18 @@ bd sync --import-only
 git pull
 bd sync --import-only
 ```
+
+**Integration settings empty in new worktree**
+```bash
+./scripts/setup-bd.sh
+```
+
+---
+
+## See Also
+
+- [BEADS-TEAM-SETUP.md](BEADS-TEAM-SETUP.md) - Initial team setup and automation
+- [CONFIGURATION.md](../skills/beads/references/CONFIGURATION.md) - YAML vs database settings
+- [session-setup.sh](session-setup.sh) - Claude Code SessionStart hook template
+- [setup-bd.sh](setup-bd.sh) - Integration settings template
+- [beads repository](https://github.com/steveyegge/beads) - Official beads project

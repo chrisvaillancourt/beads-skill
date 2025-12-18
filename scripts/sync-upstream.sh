@@ -10,7 +10,13 @@ set -euo pipefail
 #   1. Fetches the list of reference files from GitHub API
 #   2. Downloads SKILL.md and all reference files
 #   3. Removes any local files that no longer exist upstream
-#   4. Updates version in plugin.json
+#   4. Preserves local additions (files we created, not from upstream)
+#   5. Updates version in plugin.json
+#
+# Local additions:
+#   Some reference files are local additions (not from upstream).
+#   These are defined in LOCAL_ADDITIONS array and preserved during sync.
+#   To add a new local file, add its name to the LOCAL_ADDITIONS array.
 #
 # Requirements:
 #   - curl
@@ -24,6 +30,12 @@ REFS_DIR="$SKILL_DIR/references"
 
 UPSTREAM_BASE="https://raw.githubusercontent.com/steveyegge/beads/main/skills/beads"
 UPSTREAM_API="https://api.github.com/repos/steveyegge/beads/contents/skills/beads/references"
+
+# Local additions - files we created that don't exist upstream
+# These will NOT be deleted during sync
+LOCAL_ADDITIONS=(
+    "CONFIGURATION.md"  # YAML vs database settings documentation
+)
 
 # Colors for output
 RED='\033[0;31m'
@@ -99,13 +111,28 @@ for ref in "${UPSTREAM_REFS[@]}"; do
     fi
 done
 
-# Remove local files that no longer exist upstream
+# Remove local files that no longer exist upstream (but preserve local additions)
 echo ""
 echo "Checking for stale files..."
 STALE_COUNT=0
 for local_file in "$REFS_DIR"/*.md; do
     [ -e "$local_file" ] || continue
     filename=$(basename "$local_file")
+
+    # Skip local additions (files we created, not from upstream)
+    is_local_addition=false
+    for local_add in "${LOCAL_ADDITIONS[@]}"; do
+        if [ "$filename" = "$local_add" ]; then
+            is_local_addition=true
+            break
+        fi
+    done
+    if [ "$is_local_addition" = true ]; then
+        log_info "Preserving local addition: $filename"
+        continue
+    fi
+
+    # Check if file exists upstream
     found=false
     for upstream_ref in "${UPSTREAM_REFS[@]}"; do
         if [ "$filename" = "$upstream_ref" ]; then
@@ -148,8 +175,9 @@ echo "========================================="
 echo "Sync complete!"
 echo "========================================="
 echo ""
-echo "  SKILL.md:    $(wc -l < "$SKILL_DIR/SKILL.md" | tr -d ' ') lines"
-echo "  References:  ${#DOWNLOADED[@]} files"
+echo "  SKILL.md:      $(wc -l < "$SKILL_DIR/SKILL.md" | tr -d ' ') lines"
+echo "  References:    ${#DOWNLOADED[@]} files (from upstream)"
+echo "  Local kept:    ${#LOCAL_ADDITIONS[@]} files (local additions)"
 echo "  Stale removed: $STALE_COUNT"
 echo ""
 

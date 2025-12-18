@@ -51,8 +51,8 @@ bd config set sync.branch beads-sync
 
 | Setting | Purpose | Example |
 |---------|---------|---------|
-| `github.org` | GitHub organization | `genomenon` |
-| `github.repo` | GitHub repository name | `dex-sdk` |
+| `github.org` | GitHub organization | `acme-corp` |
+| `github.repo` | GitHub repository name | `my-project` |
 | `jira.url` | Jira instance URL | `https://mysite.atlassian.net/` |
 | `sync.branch` | Sync branch (also in YAML) | `beads-sync` |
 

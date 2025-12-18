@@ -34,8 +34,8 @@ set -e
 # =============================================================================
 
 # GitHub integration (for linking issues to PRs)
-GITHUB_ORG="your-org"           # e.g., "genomenon"
-GITHUB_REPO="your-repo"         # e.g., "dex-sdk"
+GITHUB_ORG="your-org"           # e.g., "acme-corp"
+GITHUB_REPO="your-repo"         # e.g., "my-project"
 
 # Jira integration (optional - comment out if not using Jira)
 JIRA_URL="https://your-site.atlassian.net/"
