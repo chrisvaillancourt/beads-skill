@@ -1,7 +1,7 @@
 {
   "name": "beads-skill",
-  "version": "0.30.2",
-  "description": "Beads skill mirror for Claude Code - issue tracking without MCP overhead. Mirrors steveyegge/beads skills/beads/ content (upstream version 0.30.2).",
+  "version": "0.30.3",
+  "description": "Beads skill mirror for Claude Code - issue tracking without MCP overhead. Mirrors steveyegge/beads skills/beads/ content (upstream version 0.30.3).",
   "author": {
     "name": "Chris Vaillancourt"
   },

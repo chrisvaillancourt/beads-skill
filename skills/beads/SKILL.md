@@ -630,19 +630,6 @@ Use JSON output when you need to parse results programmatically or extract speci
 - bd auto-imports JSONL when newer than DB (after git pull)
 - Manual operations: `bd export`, `bd import`
 
-**If deleted issues still appear in JSONL:**
-- bd uses "tombstones" for deletions - issues are marked deleted, not removed
-- Tombstones sync across clones to propagate deletions
-- Example tombstone: `{"id":"main-xxx","status":"tombstone","deleted_at":"...","delete_reason":"delete"}`
-- After `bd delete`, run `bd sync` to export tombstone to JSONL
-- This is expected behavior, not an error
-
-**If integration settings (github.org, jira.url) don't sync:**
-- Integration settings are database-only, not stored in config.yaml
-- Each clone/worktree needs these configured manually
-- Use a setup script: `bd config set github.org myorg`
-- See [references/CONFIGURATION.md](references/CONFIGURATION.md) for details
-
 ## Reference Files
 
 Detailed information organized by topic:
@@ -651,9 +638,7 @@ Detailed information organized by topic:
 |-----------|-----------|
 | [references/BOUNDARIES.md](references/BOUNDARIES.md) | Need detailed decision criteria for bd vs TodoWrite, or integration patterns |
 | [references/CLI_REFERENCE.md](references/CLI_REFERENCE.md) | Need complete command reference, flag details, or examples |
-| [references/CONFIGURATION.md](references/CONFIGURATION.md) | Need to understand YAML vs database settings, integration setup, or sync-branch configuration |
 | [references/WORKFLOWS.md](references/WORKFLOWS.md) | Need step-by-step workflows with checklists for common scenarios |
 | [references/DEPENDENCIES.md](references/DEPENDENCIES.md) | Need deep understanding of dependency types or relationship patterns |
 | [references/ISSUE_CREATION.md](references/ISSUE_CREATION.md) | Need guidance on when to ask vs create issues, issue quality, or design vs acceptance criteria |
 | [references/STATIC_DATA.md](references/STATIC_DATA.md) | Want to use bd for reference databases, glossaries, or static data instead of work tracking |
-| [references/RESUMABILITY.md](references/RESUMABILITY.md) | Need recovery strategies and persistence patterns for multi-session work |

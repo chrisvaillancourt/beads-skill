@@ -26,13 +26,42 @@ ERRORS=0
 WARNINGS=0
 
 log_pass() { echo -e "${GREEN}✓${NC} $1"; }
-log_fail() { echo -e "${RED}✗${NC} $1"; ((ERRORS++)); }
-log_warn() { echo -e "${YELLOW}⚠${NC} $1"; ((WARNINGS++)); }
+log_fail() { echo -e "${RED}✗${NC} $1"; ERRORS=$((ERRORS+1)); }
+log_warn() { echo -e "${YELLOW}⚠${NC} $1"; WARNINGS=$((WARNINGS+1)); }
 log_info() { echo -e "  $1"; }
 
 echo "========================================="
 echo "Validating beads-skill plugin"
 echo "========================================="
+echo ""
+
+# -----------------------------------------------------------------------------
+# 0. Check version alignment (bd version vs plugin version)
+# -----------------------------------------------------------------------------
+echo "Checking version alignment..."
+
+if command -v bd &> /dev/null; then
+    LOCAL_BD_VERSION=$(bd version 2>/dev/null | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' | head -1 || echo "")
+    PLUGIN_VERSION=$(jq -r '.version // ""' "$PROJECT_ROOT/.claude-plugin/plugin.json" 2>/dev/null || echo "")
+
+    if [ -n "$LOCAL_BD_VERSION" ] && [ -n "$PLUGIN_VERSION" ]; then
+        if [ "$LOCAL_BD_VERSION" = "$PLUGIN_VERSION" ]; then
+            log_pass "Plugin version matches bd version: $PLUGIN_VERSION"
+        elif [ "$(printf '%s\n' "$PLUGIN_VERSION" "$LOCAL_BD_VERSION" | sort -V | head -1)" = "$PLUGIN_VERSION" ]; then
+            # Plugin version is lower (behind)
+            log_warn "Plugin version ($PLUGIN_VERSION) is behind bd version ($LOCAL_BD_VERSION)"
+            log_info "Run ./scripts/sync-upstream.sh to update"
+        else
+            # Plugin version is higher (ahead) - unusual
+            log_warn "Plugin version ($PLUGIN_VERSION) is ahead of bd version ($LOCAL_BD_VERSION)"
+        fi
+    else
+        log_warn "Could not determine versions for comparison"
+    fi
+else
+    log_warn "bd not installed, skipping version check"
+fi
+
 echo ""
 
 # -----------------------------------------------------------------------------
