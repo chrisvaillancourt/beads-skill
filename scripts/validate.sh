@@ -245,6 +245,63 @@ for file in "${required_files[@]}"; do
 done
 
 # -----------------------------------------------------------------------------
+# 6. Check template files
+# -----------------------------------------------------------------------------
+echo ""
+echo "Checking template files..."
+
+TEMPLATES_DIR="$PROJECT_ROOT/templates"
+
+if [ ! -d "$TEMPLATES_DIR" ]; then
+    log_fail "Templates directory not found at $TEMPLATES_DIR"
+else
+    # Required template files
+    required_templates=(
+        "BEADS-TEAM-SETUP.md"
+        "BEADS-PARALLEL-AGENTS.md"
+        "setup-bd.sh"
+        "session-setup.sh"
+        "claude-settings.json"
+    )
+
+    for template in "${required_templates[@]}"; do
+        template_path="$TEMPLATES_DIR/$template"
+        if [ -f "$template_path" ]; then
+            # Check if shell scripts are executable
+            if [[ "$template" == *.sh ]]; then
+                if [ -x "$template_path" ]; then
+                    log_pass "$template (executable)"
+                else
+                    log_warn "$template exists but not executable"
+                fi
+            else
+                log_pass "$template"
+            fi
+        else
+            log_fail "$template missing"
+        fi
+    done
+fi
+
+# -----------------------------------------------------------------------------
+# 7. Check local additions (files we created, not from upstream)
+# -----------------------------------------------------------------------------
+echo ""
+echo "Checking local additions..."
+
+local_additions=(
+    "skills/beads/references/CONFIGURATION.md"
+)
+
+for local_file in "${local_additions[@]}"; do
+    if [ -f "$PROJECT_ROOT/$local_file" ]; then
+        log_pass "$local_file (local addition)"
+    else
+        log_warn "$local_file missing (local addition, not from upstream)"
+    fi
+done
+
+# -----------------------------------------------------------------------------
 # Summary
 # -----------------------------------------------------------------------------
 echo ""

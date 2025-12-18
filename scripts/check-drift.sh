@@ -6,6 +6,10 @@ set -euo pipefail
 # Compares local SKILL.md with upstream to detect if we're out of sync.
 # Used in CI to alert when upstream has changes we haven't synced.
 #
+# Note: This only checks upstream-sourced files. Local additions like
+# CONFIGURATION.md are not checked (they don't exist upstream).
+# See LOCAL_ADDITIONS in sync-upstream.sh for the list of local files.
+#
 # Exit codes:
 #   0 - No drift detected (or couldn't check)
 #   1 - Drift detected
@@ -15,6 +19,11 @@ PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
 
 UPSTREAM_URL="https://raw.githubusercontent.com/steveyegge/beads/main/skills/beads/SKILL.md"
 LOCAL_SKILL="$PROJECT_ROOT/skills/beads/SKILL.md"
+
+# Local additions - files we created that don't exist upstream (not checked for drift)
+LOCAL_ADDITIONS=(
+    "CONFIGURATION.md"
+)
 
 # Colors
 RED='\033[0;31m'
@@ -41,7 +50,10 @@ if [ ! -f "$LOCAL_SKILL" ]; then
 fi
 
 if diff -q "$LOCAL_SKILL" "$UPSTREAM_TEMP" > /dev/null 2>&1; then
-    echo -e "${GREEN}✓${NC} No drift detected - local matches upstream"
+    echo -e "${GREEN}✓${NC} No drift detected - local SKILL.md matches upstream"
+    if [ ${#LOCAL_ADDITIONS[@]} -gt 0 ]; then
+        echo -e "  Note: ${#LOCAL_ADDITIONS[@]} local addition(s) not checked: ${LOCAL_ADDITIONS[*]}"
+    fi
     exit 0
 else
     echo -e "${YELLOW}⚠${NC} Drift detected - local differs from upstream"
