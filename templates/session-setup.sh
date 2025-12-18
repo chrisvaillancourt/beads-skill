@@ -65,15 +65,24 @@ fi
 GITHUB_ORG=$(bd config get github.org 2>/dev/null || echo "")
 
 if [ -z "$GITHUB_ORG" ] || [ "$GITHUB_ORG" = "github.org (not set)" ]; then
-    # Look for setup script in common locations
-    if [ -f ./scripts/setup-bd.sh ]; then
+    # Try to auto-detect from git remote first
+    REMOTE_URL=$(git remote get-url origin 2>/dev/null || echo "")
+
+    if [[ "$REMOTE_URL" =~ github\.com[:/]([^/]+)/([^/.]+)(\.git)?$ ]]; then
+        DETECTED_ORG="${BASH_REMATCH[1]}"
+        DETECTED_REPO="${BASH_REMATCH[2]}"
+        echo "Auto-configuring bd GitHub integration: $DETECTED_ORG/$DETECTED_REPO"
+        bd config set github.org "$DETECTED_ORG"
+        bd config set github.repo "$DETECTED_REPO"
+    # Fall back to setup script for Jira and other settings
+    elif [ -f ./scripts/setup-bd.sh ]; then
         echo "Configuring bd integrations..."
         ./scripts/setup-bd.sh
     elif [ -f ./setup-bd.sh ]; then
         echo "Configuring bd integrations..."
         ./setup-bd.sh
     else
-        echo "Note: bd integrations not configured. Create scripts/setup-bd.sh to automate."
+        echo "Note: bd integrations not configured (not a GitHub repo or no setup script)."
     fi
 fi
 

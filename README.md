@@ -154,8 +154,8 @@ For parallel agents with git worktrees, also see [templates/BEADS-PARALLEL-AGENT
 |----------|---------|
 | [templates/BEADS-TEAM-SETUP.md](templates/BEADS-TEAM-SETUP.md) | Complete team setup guide |
 | [templates/BEADS-PARALLEL-AGENTS.md](templates/BEADS-PARALLEL-AGENTS.md) | Git worktrees + parallel agents |
-| [templates/setup-bd.sh](templates/setup-bd.sh) | Configure integration settings |
-| [templates/session-setup.sh](templates/session-setup.sh) | Claude Code SessionStart hook |
+| [templates/setup-bd.sh](templates/setup-bd.sh) | Configure integration settings (auto-detects GitHub) |
+| [templates/session-setup.sh](templates/session-setup.sh) | Claude Code SessionStart hook (auto-detects GitHub) |
 | [templates/claude-settings.json](templates/claude-settings.json) | Example Claude Code hook config |
 
 ### Automation with Claude Code Hooks
@@ -164,14 +164,11 @@ Automate bd initialization in git worktrees:
 
 1. Copy templates to your project:
    ```bash
-   cp /path/to/beads-skill/templates/setup-bd.sh scripts/
    cp /path/to/beads-skill/templates/session-setup.sh scripts/
-   chmod +x scripts/*.sh
+   chmod +x scripts/session-setup.sh
    ```
 
-2. Edit `scripts/setup-bd.sh` with your org/repo settings
-
-3. Add Claude Code hook (`.claude/settings.json`):
+2. Add Claude Code hook (`.claude/settings.json`):
    ```json
    {
      "hooks": {
@@ -183,7 +180,7 @@ Automate bd initialization in git worktrees:
    }
    ```
 
-Now when Claude Code starts in a new worktree, bd is automatically initialized and configured.
+Now when Claude Code starts in a new worktree, bd is automatically initialized and GitHub integration is auto-configured from the git remote. For Jira integration, also copy and configure `setup-bd.sh`.
 
 ## See Also
 

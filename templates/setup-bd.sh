@@ -18,8 +18,12 @@
 # INSTALLATION:
 #   1. Copy to your project: scripts/setup-bd.sh
 #   2. Make executable: chmod +x scripts/setup-bd.sh
-#   3. Edit the values below for your project
+#   3. (Optional) Edit JIRA_URL below if using Jira
 #   4. Run once: ./scripts/setup-bd.sh
+#
+# AUTO-DETECTION:
+#   GitHub org and repo are auto-detected from git remote.
+#   Override by setting GITHUB_ORG/GITHUB_REPO environment variables.
 #
 # AUTOMATION:
 #   Combine with session-setup.sh and Claude Code hooks for automatic
@@ -30,35 +34,57 @@
 set -e
 
 # =============================================================================
-# CONFIGURE THESE VALUES FOR YOUR PROJECT
+# CONFIGURATION
 # =============================================================================
 
-# GitHub integration (for linking issues to PRs)
-GITHUB_ORG="your-org"           # e.g., "acme-corp"
-GITHUB_REPO="your-repo"         # e.g., "my-project"
-
-# Jira integration (optional - comment out if not using Jira)
+# Jira integration (optional - set to empty string to skip)
 JIRA_URL="https://your-site.atlassian.net/"
+# JIRA_URL=""  # Uncomment to disable Jira integration
 
 # =============================================================================
-# CONFIGURATION (no changes needed below)
+# AUTO-DETECTION (no changes needed below)
+# =============================================================================
+
+# Auto-detect GitHub org and repo from git remote (if not already set)
+if [ -z "${GITHUB_ORG:-}" ] || [ -z "${GITHUB_REPO:-}" ]; then
+    REMOTE_URL=$(git remote get-url origin 2>/dev/null || echo "")
+
+    # Parse GitHub URL formats:
+    #   SSH:   git@github.com:org/repo.git
+    #   HTTPS: https://github.com/org/repo.git
+    if [[ "$REMOTE_URL" =~ github\.com[:/]([^/]+)/([^/.]+)(\.git)?$ ]]; then
+        GITHUB_ORG="${GITHUB_ORG:-${BASH_REMATCH[1]}}"
+        GITHUB_REPO="${GITHUB_REPO:-${BASH_REMATCH[2]}}"
+    fi
+fi
+
+# =============================================================================
+# APPLY CONFIGURATION
 # =============================================================================
 
 echo "Configuring bd integrations..."
 
 # GitHub settings
-bd config set github.org "$GITHUB_ORG"
-bd config set github.repo "$GITHUB_REPO"
+if [ -n "${GITHUB_ORG:-}" ] && [ -n "${GITHUB_REPO:-}" ]; then
+    bd config set github.org "$GITHUB_ORG"
+    bd config set github.repo "$GITHUB_REPO"
+    echo "  GitHub: $GITHUB_ORG/$GITHUB_REPO (auto-detected from git remote)"
+else
+    echo "  GitHub: skipped (not a GitHub repo or couldn't detect)"
+fi
 
-# Jira settings (comment out if not using Jira)
-if [ -n "$JIRA_URL" ]; then
+# Jira settings
+if [ -n "${JIRA_URL:-}" ] && [ "$JIRA_URL" != "https://your-site.atlassian.net/" ]; then
     bd config set jira.url "$JIRA_URL"
+    echo "  Jira: $JIRA_URL"
+else
+    echo "  Jira: skipped (edit JIRA_URL in script to configure)"
 fi
 
 # Verify configuration
 echo ""
-echo "bd integrations configured:"
-bd config list | grep -E "github\.|jira\." || echo "(no matching settings found)"
+echo "Current bd integrations:"
+bd config list | grep -E "github\.|jira\." || echo "  (none configured)"
 
 echo ""
 echo "Done. Run 'bd doctor' to verify full setup."

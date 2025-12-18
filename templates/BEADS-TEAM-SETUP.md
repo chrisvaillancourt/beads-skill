@@ -48,24 +48,25 @@ echo '!config.yaml' >> .beads/.gitignore
 
 **Why:** Ensures `sync-branch` setting is shared across all clones/worktrees.
 
-### Step 5: Create integration setup script
+### Step 5: Create integration setup script (optional)
 
-Create `scripts/setup-bd.sh` for database-only settings that don't sync via git:
+For GitHub repos, integration settings are **auto-detected** from the git remote. No setup script needed!
 
-```bash
-#!/usr/bin/env bash
-set -e
-echo "Configuring bd integrations..."
-bd config set github.org YOUR_ORG
-bd config set github.repo YOUR_REPO
-bd config set jira.url https://YOUR_SITE.atlassian.net/
-echo "Done."
-```
+For Jira integration or non-GitHub repos, create `scripts/setup-bd.sh`:
 
 ```bash
+# Copy the template
+cp /path/to/beads-skill/templates/setup-bd.sh scripts/
 chmod +x scripts/setup-bd.sh
+
+# Edit JIRA_URL if using Jira, then run
 ./scripts/setup-bd.sh
 ```
+
+The script will:
+- Auto-detect GitHub org/repo from `git remote get-url origin`
+- Configure Jira if JIRA_URL is set
+- Allow env var overrides: `GITHUB_ORG=foo GITHUB_REPO=bar ./scripts/setup-bd.sh`
 
 **Why:** Integration settings (github.org, jira.url) are database-only. See [Configuration Types](#configuration-types) below.
 
